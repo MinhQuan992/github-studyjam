@@ -3,63 +3,74 @@
 import { Button, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import React from "react";
-import * as yup from "yup";
-
-const CredentialSchema = yup.object({
-  username: yup.string().required("Username is required."),
-  password: yup.string().required("Password is required."),
-});
-
-type CredentialSchemaType = yup.InferType<typeof CredentialSchema>;
+import { CredentialSchemaType, CredentialSchema } from "@lib/definitions";
+import { authenticate } from "@actions/authentication-action";
 
 const LoginForm = () => {
-  const formik = useFormik<CredentialSchemaType>({
+  const {
+    values,
+    touched,
+    errors,
+    status,
+    setStatus,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+  } = useFormik<CredentialSchemaType>({
     initialValues: {
       username: "",
       password: "",
     },
     validationSchema: CredentialSchema,
-    onSubmit: (values) => {
-      // TODO: change the logic here
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async (values) => {
+      const result = await authenticate(values);
+      setStatus(result);
     },
   });
 
+  const resetStatus = () => {
+    setStatus("");
+  };
+
   return (
     <div>
-      <form onSubmit={formik.handleSubmit}>
+      <form
+        className="flex flex-col items-center w-screen"
+        onSubmit={handleSubmit}
+      >
         <TextField
-          fullWidth
-          className="pb-4"
+          className="pb-4 w-1/3"
           id="username"
           name="username"
           label="Username"
-          value={formik.values.username}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.username && Boolean(formik.errors.username)}
-          helperText={formik.touched.username && formik.errors.username}
+          value={values.username}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={resetStatus}
+          error={touched.username && Boolean(errors.username)}
+          helperText={touched.username && errors.username}
         />
         <TextField
-          fullWidth
-          className="pb-4"
+          className="pb-4 w-1/3"
           id="password"
           name="password"
           label="Password"
           type="password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.password && Boolean(formik.errors.password)}
-          helperText={formik.touched.password && formik.errors.password}
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onFocus={resetStatus}
+          error={touched.password && Boolean(errors.password)}
+          helperText={touched.password && errors.password}
         />
         <Button
           type="submit"
-          className="w-full border-solid border"
+          className="w-1/3 border-solid border"
           color="primary"
         >
           Log in
         </Button>
+        {status && <p className="w-1/3 text-red-600 pt-4">{status}</p>}
       </form>
     </div>
   );
