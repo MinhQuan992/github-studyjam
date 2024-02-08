@@ -3,6 +3,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:admin": "turbo dev --filter admin",
+    "dev:participant": "turbo dev --filter participant",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
