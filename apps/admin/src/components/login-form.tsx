@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import React from "react";
 import { CredentialSchemaType, CredentialSchema } from "@lib/definitions";
@@ -12,6 +12,7 @@ const LoginForm = () => {
     touched,
     errors,
     status,
+    isSubmitting,
     setStatus,
     handleSubmit,
     handleChange,
@@ -66,7 +67,8 @@ const LoginForm = () => {
         <Button
           type="submit"
           className="w-1/3 border-solid border"
-          color="primary"
+          endIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
+          disabled={isSubmitting}
         >
           Log in
         </Button>

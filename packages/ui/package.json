@@ -5,7 +5,8 @@
     "**/*.css"
   ],
   "exports": {
-    "./styles.css": "./dist/index.css"
+    "./styles.css": "./dist/index.css",
+    "./sidenav": "./src/sidenav.tsx"
   },
   "license": "MIT",
   "scripts": {
@@ -33,6 +34,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.15.7"
+    "@mui/icons-material": "^5.15.9",
+    "@mui/material": "^5.15.7",
+    "next": "14.0.4"
   }
 }

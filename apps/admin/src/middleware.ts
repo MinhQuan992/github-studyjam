@@ -9,7 +9,9 @@ export const middleware = async (request: NextRequest) => {
     const tokenValid = await isValidJwt(token);
 
     if (tokenValid) {
-      return NextResponse.next();
+      return request.nextUrl.pathname === "/"
+        ? NextResponse.redirect(new URL("/dashboard", request.url))
+        : NextResponse.next();
     }
 
     return performRedirect(request);
