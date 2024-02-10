@@ -3,6 +3,7 @@
 import { Tab, Tabs } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const a11yProps = (index: number) => {
   return {
@@ -22,7 +23,9 @@ interface SideNavProps {
 }
 
 const SideNav = ({ tabs }: SideNavProps) => {
-  const [value, setValue] = useState(0);
+  const pathname = usePathname();
+  const activeTabNumber = tabs.findIndex((tab) => tab.href === pathname);
+  const [value, setValue] = useState(activeTabNumber);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
     setValue(newValue);

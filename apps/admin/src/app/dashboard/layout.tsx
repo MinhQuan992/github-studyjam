@@ -28,7 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-screen">
       <SideNav tabs={tabs} />
-      <div className="flex-grow pt-4 px-4">{children}</div>
+      <div className="flex-grow pt-8 px-8">{children}</div>
     </div>
   );
 };

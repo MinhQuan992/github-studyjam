@@ -1,14 +1,14 @@
-import { unstable_noStore } from "next/cache";
-import React from "react";
+import { getAllUsers } from "@actions/user-action";
+import UserTable from "@components/users/user-table";
+import PageHeader from "@repo/ui/page-header";
 
 const Page = async () => {
-  // TODO: use the fetch below for loader testing only
-  unstable_noStore();
-  await fetch("https://swapi.dev/api/people");
+  const users = await getAllUsers();
 
   return (
     <div>
-      <h1>Users</h1>
+      <PageHeader title="Users" />
+      <UserTable users={JSON.parse(JSON.stringify(users))} />
     </div>
   );
 };
