@@ -1,10 +1,13 @@
 import { Button, CircularProgress } from "@mui/material";
+import { MouseEventHandler } from "react";
 
 interface CustomButtonProps {
   label: string;
   buttonType: "primary" | "secondary" | "danger";
   isLoading?: boolean;
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const CustomButton = ({
@@ -12,6 +15,8 @@ const CustomButton = ({
   buttonType,
   isLoading = false,
   disabled = false,
+  type,
+  onClick,
 }: CustomButtonProps) => {
   const shouldDisable = isLoading || disabled;
 
@@ -26,6 +31,8 @@ const CustomButton = ({
             ) : null
           }
           disabled={shouldDisable}
+          type={type}
+          onClick={onClick}
         >
           {label}
         </Button>
@@ -40,6 +47,8 @@ const CustomButton = ({
             ) : null
           }
           disabled={shouldDisable}
+          type={type}
+          onClick={onClick}
         >
           {label}
         </Button>
@@ -54,6 +63,8 @@ const CustomButton = ({
             ) : null
           }
           disabled={shouldDisable}
+          type={type}
+          onClick={onClick}
         >
           {label}
         </Button>

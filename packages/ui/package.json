@@ -7,6 +7,7 @@
   "exports": {
     "./styles.css": "./dist/index.css",
     "./custom-button": "./src/custom-button.tsx",
+    "./custom-modal": "./src/custom-modal.tsx",
     "./page-header": "./src/page-header.tsx",
     "./sidenav": "./src/sidenav.tsx"
   },
