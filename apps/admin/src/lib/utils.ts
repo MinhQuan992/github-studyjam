@@ -1,17 +1,27 @@
 import * as jose from "jose";
+import { USER_ROLES } from "./constants";
 
-export const isValidJwt = async (token: string) => {
+export const verifyJwt = async (token?: string) => {
+  if (!token) {
+    return null;
+  }
+
   const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
-  const { payload } = await jose.jwtVerify(token, secret);
-  const { sub, iat, exp } = payload;
 
-  if (!sub || !iat || !exp) {
+  try {
+    const { payload } = await jose.jwtVerify(token, secret);
+    return payload;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const isRole = async (role: USER_ROLES, token?: string) => {
+  const decodedToken = await verifyJwt(token);
+
+  if (!decodedToken) {
     return false;
   }
 
-  if (new Date(1000 * exp) < new Date()) {
-    return false;
-  }
-
-  return true;
+  return decodedToken.role === role;
 };

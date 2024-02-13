@@ -1,3 +1,4 @@
+import { USER_ROLES } from "@lib/constants";
 import mongoose from "mongoose";
 
 export interface IUser extends mongoose.Document {
@@ -14,8 +15,8 @@ const UserModel = new mongoose.Schema(
     password: String,
     role: {
       type: String,
-      enum: ["SUPER_ADMIN", "ADMIN"],
-      default: ["ADMIN"],
+      enum: Object.values(USER_ROLES),
+      default: USER_ROLES.ADMIN,
     },
   },
   {

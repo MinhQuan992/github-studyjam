@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { isValidJwt } from "@lib/utils";
+import { verifyJwt } from "@lib/utils";
+import { SESSION_COOKIE_NAME } from "@lib/constants";
 
 export const middleware = async (request: NextRequest) => {
-  const token = request.cookies.get("session")?.value;
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   if (token) {
-    const tokenValid = await isValidJwt(token);
+    const decodedToken = await verifyJwt(token);
 
-    if (tokenValid) {
+    if (decodedToken) {
       return request.nextUrl.pathname === "/"
         ? NextResponse.redirect(new URL("/dashboard", request.url))
         : NextResponse.next();

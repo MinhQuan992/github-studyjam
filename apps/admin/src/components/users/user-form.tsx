@@ -1,5 +1,8 @@
 "use client";
 
+import { actionWithRole } from "@actions/base-action";
+import { addUser, editUser } from "@actions/user-action";
+import { USER_ROLES } from "@lib/constants";
 import { UserFormSchema, UserFormSchemaType } from "@lib/definitions";
 import { IUser } from "@models/user";
 import { Checkbox, FormControlLabel, TextField } from "@mui/material";
@@ -12,8 +15,6 @@ interface UserFormProps {
   hasPasswordCheckbox?: boolean;
   passwordCheckboxText?: string;
   closeModal: () => void;
-  // TODO: change the return type to the correct type
-  handleSave: (values: UserFormSchemaType) => void;
 }
 
 const UserForm = ({
@@ -21,16 +22,60 @@ const UserForm = ({
   hasPasswordCheckbox = false,
   passwordCheckboxText = "",
   closeModal,
-  handleSave,
 }: UserFormProps) => {
+  const handleAddUser = async (values: UserFormSchemaType) => {
+    const result = await actionWithRole(
+      USER_ROLES.SUPER_ADMIN,
+      addUser,
+      values
+    );
+    if (!result.success) {
+      if (result.fieldError === "username") {
+        setErrors({
+          username: result.message,
+        });
+      } else {
+        setErrors({
+          password: result.message,
+        });
+      }
+    } else {
+      closeModal();
+    }
+  };
+
+  const handleEditUser = async (values: UserFormSchemaType, id: string) => {
+    const result = await actionWithRole(
+      USER_ROLES.SUPER_ADMIN,
+      editUser,
+      values,
+      id
+    );
+    if (!result.success) {
+      setErrors({
+        username: result.message,
+      });
+    } else {
+      closeModal();
+    }
+  };
+
+  const onSubmitHandler = async (values: UserFormSchemaType) => {
+    if (!user) {
+      await handleAddUser(values);
+    } else {
+      await handleEditUser(values, user._id);
+    }
+  };
+
   const {
     values,
     touched,
     errors,
-    status,
     isSubmitting,
+    dirty,
+    setFieldValue,
     setErrors,
-    setStatus,
     handleSubmit,
     handleChange,
     handleBlur,
@@ -38,13 +83,11 @@ const UserForm = ({
     initialValues: {
       fullName: user?.fullName || "",
       username: user?.username || "",
+      newPassword: !hasPasswordCheckbox,
       password: "",
     },
     validationSchema: UserFormSchema,
-    onSubmit: async (values) => {
-      handleSave(values);
-      closeModal();
-    },
+    onSubmit: onSubmitHandler,
   });
   const [enablePassword, setEnablePassword] = useState(!hasPasswordCheckbox);
 
@@ -58,7 +101,6 @@ const UserForm = ({
           value={values.fullName}
           onChange={handleChange}
           onBlur={handleBlur}
-          //onFocus={resetStatus}
           error={touched.fullName && Boolean(errors.fullName)}
           helperText={touched.fullName && errors.fullName}
         />
@@ -69,7 +111,6 @@ const UserForm = ({
           value={values.username}
           onChange={handleChange}
           onBlur={handleBlur}
-          //onFocus={resetStatus}
           error={touched.username && Boolean(errors.username)}
           helperText={touched.username && errors.username}
         />
@@ -80,9 +121,7 @@ const UserForm = ({
               <Checkbox
                 onChange={(event) => {
                   setEnablePassword(event.target.checked);
-                  setErrors({
-                    password: "",
-                  });
+                  setFieldValue("newPassword", event.target.checked);
                 }}
               />
             }
@@ -97,7 +136,6 @@ const UserForm = ({
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={!enablePassword}
-          //onFocus={resetStatus}
           error={touched.password && Boolean(errors.password)}
           helperText={touched.password && errors.password}
         />
@@ -108,6 +146,7 @@ const UserForm = ({
             onClick={closeModal}
           />
           <CustomButton
+            disabled={!dirty}
             label="Save"
             buttonType="primary"
             type="submit"

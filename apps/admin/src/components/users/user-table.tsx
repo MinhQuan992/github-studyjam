@@ -7,7 +7,9 @@ import CustomButton from "@repo/ui/custom-button";
 import { ChangeEvent, useState } from "react";
 import CustomModal from "@repo/ui/custom-modal";
 import UserForm from "./user-form";
-import { UserFormSchemaType } from "@lib/definitions";
+import { actionWithRole } from "@actions/base-action";
+import { USER_ROLES } from "@lib/constants";
+import { deleteUsers } from "@actions/user-action";
 
 export interface UserTableProps {
   users: IUser[];
@@ -26,8 +28,8 @@ const UserTable = ({ users }: UserTableProps) => {
   const [openEditUserModal, setOpenEditUserModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
 
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [selectedUserIds, setSelectedUserIds] = useState([""]);
+  const [selectedUsername, setSelectedUsername] = useState("");
+  const [selectedUsernames, setSelectedUsernames] = useState([""]);
 
   const handleCloseAddUserModal = () => setOpenAddUserModal(false);
   const handleCloseDeleteManyUsersModal = () =>
@@ -41,9 +43,9 @@ const UserTable = ({ users }: UserTableProps) => {
     setRowCheckboxes(rowCheckboxes.map(() => isChecked));
     setEnableDeleteButton(isChecked);
     if (isChecked) {
-      setSelectedUserIds(users.map((user) => user._id));
+      setSelectedUsernames(users.map((user) => user.username));
     } else {
-      setSelectedUserIds([""]);
+      setSelectedUsernames([""]);
     }
   };
 
@@ -53,10 +55,10 @@ const UserTable = ({ users }: UserTableProps) => {
     setRowCheckboxes(updatedRowCheckboxes);
     setSelectAllChecked(updatedRowCheckboxes.every((checkbox) => checkbox));
     setEnableDeleteButton(updatedRowCheckboxes.some((checkbox) => checkbox));
-    setSelectedUserIds(
+    setSelectedUsernames(
       users
         .filter((_user, index) => updatedRowCheckboxes[index])
-        .map((user) => user._id)
+        .map((user) => user.username)
     );
   };
 
@@ -109,7 +111,7 @@ const UserTable = ({ users }: UserTableProps) => {
                   <IconButton
                     onClick={() => {
                       setOpenEditUserModal(true);
-                      setSelectedUserId(users[index]._id);
+                      setSelectedUsername(users[index].username);
                     }}
                   >
                     <BorderColor />
@@ -117,7 +119,7 @@ const UserTable = ({ users }: UserTableProps) => {
                   <IconButton
                     onClick={() => {
                       setOpenDeleteUserModal(true);
-                      setSelectedUserId(users[index]._id);
+                      setSelectedUsername(users[index].username);
                     }}
                   >
                     <DeleteOutline />
@@ -133,10 +135,7 @@ const UserTable = ({ users }: UserTableProps) => {
         open={openAddUserModal}
         handleClose={handleCloseAddUserModal}
       >
-        <UserForm
-          closeModal={handleCloseAddUserModal}
-          handleSave={(values: UserFormSchemaType) => console.log(values)}
-        />
+        <UserForm closeModal={handleCloseAddUserModal} />
       </CustomModal>
       <CustomModal
         title="Delete user(s)"
@@ -144,17 +143,19 @@ const UserTable = ({ users }: UserTableProps) => {
         handleClose={handleCloseDeleteManyUsersModal}
       >
         <div className="flex flex-col gap-4">
-          <p>{`Are you sure to delete (these) user(s): ${selectedUserIds.join(", ")}?`}</p>
-          <div className="flex justify-center gap-4">
-            <CustomButton
-              label="Cancel"
-              buttonType="secondary"
-              onClick={handleCloseDeleteManyUsersModal}
-            />
+          <p>{`Are you sure to delete (these) user(s): ${selectedUsernames.join(", ")}?`}</p>
+          <div className="flex justify-center">
             <CustomButton
               label="Delete"
               buttonType="danger"
-              onClick={() => alert("Delete user(s)")}
+              onClick={async () => {
+                await actionWithRole(
+                  USER_ROLES.SUPER_ADMIN,
+                  deleteUsers,
+                  selectedUsernames
+                );
+                handleCloseDeleteManyUsersModal();
+              }}
             />
           </div>
         </div>
@@ -165,17 +166,17 @@ const UserTable = ({ users }: UserTableProps) => {
         handleClose={handleCloseDeleteUserModal}
       >
         <div className="flex flex-col gap-4">
-          <p>Are you sure to delete user {selectedUserId}?</p>
-          <div className="flex justify-center gap-4">
-            <CustomButton
-              label="Cancel"
-              buttonType="secondary"
-              onClick={handleCloseDeleteUserModal}
-            />
+          <p>Are you sure to delete user {selectedUsername}?</p>
+          <div className="flex justify-center">
             <CustomButton
               label="Delete"
               buttonType="danger"
-              onClick={() => alert("Delete user")}
+              onClick={async () => {
+                await actionWithRole(USER_ROLES.SUPER_ADMIN, deleteUsers, [
+                  selectedUsername,
+                ]);
+                handleCloseDeleteUserModal();
+              }}
             />
           </div>
         </div>
@@ -186,13 +187,10 @@ const UserTable = ({ users }: UserTableProps) => {
         handleClose={handleCloseEditUserModal}
       >
         <UserForm
-          user={users.find((user) => user._id === selectedUserId)}
+          user={users.find((user) => user.username === selectedUsername)}
           hasPasswordCheckbox={true}
           passwordCheckboxText="Set a new password"
           closeModal={handleCloseEditUserModal}
-          handleSave={(values: UserFormSchemaType) =>
-            setTimeout(() => console.log(values), 5000)
-          }
         />
       </CustomModal>
     </div>

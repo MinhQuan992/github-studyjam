@@ -1,6 +1,9 @@
 "use server";
 
-import { WRONG_USERNAME_OR_PASSWORD_MESSAGE } from "@lib/constants";
+import {
+  SESSION_COOKIE_NAME,
+  WRONG_USERNAME_OR_PASSWORD_MESSAGE,
+} from "@lib/constants";
 import { CredentialSchemaType } from "@lib/definitions";
 import connectDB from "@lib/mongodb";
 import { User } from "@models/user";
@@ -23,14 +26,14 @@ export const authenticate = async (data: CredentialSchemaType) => {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
   const alg = "HS256";
 
-  const token = await new jose.SignJWT()
+  const token = await new jose.SignJWT({ role: user.role })
     .setProtectedHeader({ alg })
     .setSubject(user.username)
     .setIssuedAt()
     .setExpirationTime("2h")
     .sign(secret);
 
-  cookies().set("session", token, {
+  cookies().set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 2,

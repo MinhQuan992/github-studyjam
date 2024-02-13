@@ -1,6 +1,7 @@
-import { Box, Modal } from "@mui/material";
+import { Box, IconButton, Modal } from "@mui/material";
 import PageHeader from "./page-header";
 import { ReactNode } from "react";
+import { Clear } from "@mui/icons-material";
 
 interface CustomModalProps {
   title: string;
@@ -30,7 +31,16 @@ const CustomModal = ({
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <div className="flex flex-col">
-          <PageHeader title={title} />
+          <div className="flex ui-justify-between">
+            <PageHeader title={title} />
+            <IconButton
+              onClick={() => {
+                handleClose();
+              }}
+            >
+              <Clear />
+            </IconButton>
+          </div>
           {children}
         </div>
       </Box>

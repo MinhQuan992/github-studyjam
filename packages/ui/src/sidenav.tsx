@@ -37,7 +37,7 @@ const SideNav = ({ tabs }: SideNavProps) => {
       onChange={handleChange}
       aria-label="SideNav"
       orientation="vertical"
-      className="ui-h-screen ui-w-fit ui-bg-blue-500"
+      className="ui-h-screen ui-w-fit ui-bg-blue-500 ui-fixed"
       TabIndicatorProps={{
         style: {
           color: "white",
