@@ -10,6 +10,7 @@ import UserForm from "./user-form";
 import { actionWithRole } from "@actions/base-action";
 import { USER_ROLES } from "@lib/constants";
 import { deleteUsers } from "@actions/user-action";
+import CustomSnackbar from "@repo/ui/custom-snackbar";
 
 export interface UserTableProps {
   users: IUser[];
@@ -27,6 +28,10 @@ const UserTable = ({ users }: UserTableProps) => {
     useState(false);
   const [openEditUserModal, setOpenEditUserModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
+
+  const [openAddUserSnackbar, setOpenAddUserSnackbar] = useState(false);
+  const [openEditUserSnackbar, setOpenEditUserSnackbar] = useState(false);
+  const [openDeleteUserSnackbar, setOpenDeleteUserSnackbar] = useState(false);
 
   const [selectedUsername, setSelectedUsername] = useState("");
   const [selectedUsernames, setSelectedUsernames] = useState([""]);
@@ -60,6 +65,15 @@ const UserTable = ({ users }: UserTableProps) => {
         .filter((_user, index) => updatedRowCheckboxes[index])
         .map((user) => user.username)
     );
+  };
+
+  const handleResetCheckboxes = () => {
+    setSelectAllChecked(false);
+    setRowCheckboxes(rowCheckboxes.map(() => false));
+    setEnableDeleteButton(false);
+    setSelectedUsernames([""]);
+    setSelectedUsername("");
+    setOpenDeleteUserSnackbar(true);
   };
 
   return (
@@ -136,7 +150,10 @@ const UserTable = ({ users }: UserTableProps) => {
         open={openAddUserModal}
         handleClose={handleCloseAddUserModal}
       >
-        <UserForm closeModal={handleCloseAddUserModal} />
+        <UserForm
+          closeModal={handleCloseAddUserModal}
+          openSnackbar={() => setOpenAddUserSnackbar(true)}
+        />
       </CustomModal>
       <CustomModal
         title="Delete user(s)"
@@ -156,10 +173,7 @@ const UserTable = ({ users }: UserTableProps) => {
                   selectedUsernames
                 );
                 handleCloseDeleteManyUsersModal();
-                setSelectAllChecked(false);
-                setRowCheckboxes(rowCheckboxes.map(() => false));
-                setEnableDeleteButton(false);
-                setSelectedUsernames([""]);
+                handleResetCheckboxes();
               }}
             />
           </div>
@@ -181,6 +195,7 @@ const UserTable = ({ users }: UserTableProps) => {
                   selectedUsername,
                 ]);
                 handleCloseDeleteUserModal();
+                handleResetCheckboxes();
               }}
             />
           </div>
@@ -196,8 +211,24 @@ const UserTable = ({ users }: UserTableProps) => {
           hasPasswordCheckbox={true}
           passwordCheckboxText="Set a new password"
           closeModal={handleCloseEditUserModal}
+          openSnackbar={() => setOpenEditUserSnackbar(true)}
         />
       </CustomModal>
+      <CustomSnackbar
+        openState={openAddUserSnackbar}
+        setOpenState={setOpenAddUserSnackbar}
+        message="Added user successfully!"
+      />
+      <CustomSnackbar
+        openState={openDeleteUserSnackbar}
+        setOpenState={setOpenDeleteUserSnackbar}
+        message="Deleted user(s) successfully!"
+      />
+      <CustomSnackbar
+        openState={openEditUserSnackbar}
+        setOpenState={setOpenEditUserSnackbar}
+        message="Edited user successfully!"
+      />
     </div>
   );
 };

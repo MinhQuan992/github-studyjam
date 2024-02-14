@@ -5,6 +5,7 @@ import { ProfileFormSchema, ProfileFormSchemaType } from "@lib/definitions";
 import { IUser } from "@models/user";
 import { Checkbox, FormControlLabel, TextField } from "@mui/material";
 import CustomButton from "@repo/ui/custom-button";
+import CustomSnackbar from "@repo/ui/custom-snackbar";
 import { useFormik } from "formik";
 import { useState } from "react";
 
@@ -14,6 +15,7 @@ interface ProfileFormProps {
 
 const ProfileForm = ({ user }: ProfileFormProps) => {
   const [enablePassword, setEnablePassword] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const {
     values,
     touched,
@@ -34,6 +36,7 @@ const ProfileForm = ({ user }: ProfileFormProps) => {
       await changePassword(values);
       resetForm();
       setEnablePassword(false);
+      setOpenSnackbar(true);
     },
   });
 
@@ -91,6 +94,11 @@ const ProfileForm = ({ user }: ProfileFormProps) => {
           isLoading={isSubmitting}
         />
       </div>
+      <CustomSnackbar
+        openState={openSnackbar}
+        setOpenState={setOpenSnackbar}
+        message="Changed password successfully!"
+      />
     </form>
   );
 };

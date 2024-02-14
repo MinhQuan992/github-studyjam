@@ -8,6 +8,7 @@
     "./styles.css": "./dist/index.css",
     "./custom-button": "./src/custom-button.tsx",
     "./custom-modal": "./src/custom-modal.tsx",
+    "./custom-snackbar": "./src/custom-snackbar.tsx",
     "./page-header": "./src/page-header.tsx",
     "./sidenav": "./src/sidenav.tsx"
   },

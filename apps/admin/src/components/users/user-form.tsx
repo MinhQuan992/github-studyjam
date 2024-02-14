@@ -15,6 +15,7 @@ interface UserFormProps {
   hasPasswordCheckbox?: boolean;
   passwordCheckboxText?: string;
   closeModal: () => void;
+  openSnackbar: () => void;
 }
 
 const UserForm = ({
@@ -22,13 +23,17 @@ const UserForm = ({
   hasPasswordCheckbox = false,
   passwordCheckboxText = "",
   closeModal,
+  openSnackbar,
 }: UserFormProps) => {
-  const handleAddUser = async (values: UserFormSchemaType) => {
-    const result = await actionWithRole(
-      USER_ROLES.SUPER_ADMIN,
-      addUser,
-      values
-    );
+  const onSubmitHandler = async (values: UserFormSchemaType) => {
+    const result = !user
+      ? await actionWithRole(USER_ROLES.SUPER_ADMIN, addUser, values)
+      : await actionWithRole(
+          USER_ROLES.SUPER_ADMIN,
+          editUser,
+          values,
+          user._id
+        );
     if (!result.success) {
       if (result.fieldError === "username") {
         setErrors({
@@ -41,30 +46,7 @@ const UserForm = ({
       }
     } else {
       closeModal();
-    }
-  };
-
-  const handleEditUser = async (values: UserFormSchemaType, id: string) => {
-    const result = await actionWithRole(
-      USER_ROLES.SUPER_ADMIN,
-      editUser,
-      values,
-      id
-    );
-    if (!result.success) {
-      setErrors({
-        username: result.message,
-      });
-    } else {
-      closeModal();
-    }
-  };
-
-  const onSubmitHandler = async (values: UserFormSchemaType) => {
-    if (!user) {
-      await handleAddUser(values);
-    } else {
-      await handleEditUser(values, user._id);
+      openSnackbar();
     }
   };
 
