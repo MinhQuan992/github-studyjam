@@ -1,13 +1,22 @@
+import { USER_ROLES } from "@lib/constants";
 import mongoose from "mongoose";
+
+export interface IUser extends mongoose.Document {
+  fullName: string;
+  username: string;
+  password: string;
+  role: string;
+}
 
 const UserModel = new mongoose.Schema(
   {
+    fullName: String,
     username: String,
     password: String,
     role: {
       type: String,
-      enum: ["SUPER_ADMIN", "ADMIN"],
-      default: ["ADMIN"],
+      enum: Object.values(USER_ROLES),
+      default: USER_ROLES.ADMIN,
     },
   },
   {
@@ -16,4 +25,5 @@ const UserModel = new mongoose.Schema(
   }
 );
 
-export const User = mongoose.models.User || mongoose.model("User", UserModel);
+export const User =
+  mongoose.models.User || mongoose.model<IUser>("User", UserModel);
