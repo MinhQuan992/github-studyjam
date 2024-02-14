@@ -1,14 +1,18 @@
-import { unstable_noStore } from "next/cache";
-import React from "react";
+import { getProfileInfo } from "@actions/profile-action";
+import ProfileForm from "@components/profile/profile-form";
+import PageHeader from "@repo/ui/page-header";
 
 const Page = async () => {
-  // TODO: use the fetch below for loader testing only
-  unstable_noStore();
-  await fetch("https://swapi.dev/api/people");
+  const response = await getProfileInfo();
 
   return (
     <div>
-      <h1>Profile</h1>
+      <PageHeader title="Profile" />
+      {response.success ? (
+        <ProfileForm user={JSON.parse(JSON.stringify(response.data))} />
+      ) : (
+        <div>An error has occurred.</div>
+      )}
     </div>
   );
 };

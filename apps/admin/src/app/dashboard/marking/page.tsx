@@ -8,7 +8,7 @@ const Page = async () => {
 
   return (
     <div>
-      <PageHeader title="Leaderboard" />
+      <PageHeader title="Marking" />
     </div>
   );
 };

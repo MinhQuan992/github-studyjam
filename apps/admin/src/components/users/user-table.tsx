@@ -82,6 +82,7 @@ const UserTable = ({ users }: UserTableProps) => {
           <tr>
             <th>
               <Checkbox
+                disabled={users.length === 0}
                 checked={selectAllChecked}
                 onChange={handleSelectAllChange}
               />
@@ -155,6 +156,10 @@ const UserTable = ({ users }: UserTableProps) => {
                   selectedUsernames
                 );
                 handleCloseDeleteManyUsersModal();
+                setSelectAllChecked(false);
+                setRowCheckboxes(rowCheckboxes.map(() => false));
+                setEnableDeleteButton(false);
+                setSelectedUsernames([""]);
               }}
             />
           </div>

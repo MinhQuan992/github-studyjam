@@ -10,17 +10,26 @@ import { User } from "@models/user";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as jose from "jose";
+import * as bcrypt from "bcryptjs";
+import { ServerActionResponse } from "./base-action";
 
-export const authenticate = async (data: CredentialSchemaType) => {
+export const authenticate = async (
+  data: CredentialSchemaType
+): Promise<ServerActionResponse> => {
   await connectDB();
   const user = await User.findOne({ username: data.username }).exec();
   if (!user) {
-    return WRONG_USERNAME_OR_PASSWORD_MESSAGE;
+    return {
+      success: false,
+      message: WRONG_USERNAME_OR_PASSWORD_MESSAGE,
+    };
   }
 
-  // TODO: compare the raw password with the encrypted one
-  if (user.password !== data.password) {
-    return WRONG_USERNAME_OR_PASSWORD_MESSAGE;
+  if (!bcrypt.compareSync(data.password, user.password)) {
+    return {
+      success: false,
+      message: WRONG_USERNAME_OR_PASSWORD_MESSAGE,
+    };
   }
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);

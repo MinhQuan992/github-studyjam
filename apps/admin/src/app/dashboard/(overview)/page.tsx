@@ -1,5 +1,5 @@
+import PageHeader from "@repo/ui/page-header";
 import { unstable_noStore } from "next/cache";
-import React from "react";
 
 const Page = async () => {
   // TODO: use the fetch below for loader testing only
@@ -8,7 +8,7 @@ const Page = async () => {
 
   return (
     <div>
-      <h1>Home</h1>
+      <PageHeader title="Home" />
     </div>
   );
 };

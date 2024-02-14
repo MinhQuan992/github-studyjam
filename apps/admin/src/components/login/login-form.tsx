@@ -24,8 +24,10 @@ const LoginForm = () => {
     },
     validationSchema: CredentialSchema,
     onSubmit: async (values) => {
-      const result = await authenticate(values);
-      setStatus(result);
+      const response = await authenticate(values);
+      if (response?.success === false) {
+        setStatus(response.message);
+      }
     },
   });
 

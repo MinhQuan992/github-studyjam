@@ -28,7 +28,6 @@ export const getAllUsers = async (): Promise<ServerActionResponse> => {
 export const addUser = async (
   data: UserFormSchemaType
 ): Promise<ServerActionResponse> => {
-  await connectDB();
   try {
     const validatedFields = await UserFormSchema.validate(data);
 
@@ -40,6 +39,7 @@ export const addUser = async (
       };
     }
 
+    await connectDB();
     const existingUserWithTheSameUsername = await User.find({
       username: validatedFields.username,
     }).exec();
@@ -86,11 +86,11 @@ export const editUser = async (
   data: UserFormSchemaType,
   id: string
 ): Promise<ServerActionResponse> => {
-  await connectDB();
-  const user = await User.findById(id).exec();
-
   try {
     const validatedFields = await UserFormSchema.validate(data);
+
+    await connectDB();
+    const user = await User.findById(id).exec();
 
     if (user.username !== data.username) {
       const userWithNewUserName = await User.find({
@@ -108,24 +108,16 @@ export const editUser = async (
       }
     }
 
-    let updateObject;
+    user.fullName = validatedFields.fullName;
+    user.username = validatedFields.username;
 
     if (validatedFields.newPassword && validatedFields.password) {
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(validatedFields.password, salt);
-      updateObject = {
-        fullName: validatedFields.fullName,
-        username: validatedFields.username,
-        password: hashedPassword,
-      };
-    } else {
-      updateObject = {
-        fullName: validatedFields.fullName,
-        username: validatedFields.username,
-      };
+      user.password = hashedPassword;
     }
 
-    await User.updateOne({ _id: id }, { ...updateObject });
+    user.save();
 
     return {
       success: true,

@@ -27,3 +27,15 @@ export const UserFormSchema = yup.object({
 });
 
 export type UserFormSchemaType = yup.InferType<typeof UserFormSchema>;
+
+export const ProfileFormSchema = yup.object({
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+      "Password must contain at least 8 characters, including at least one lowercase letter, one uppercase letter, one number, and one special character."
+    )
+    .required("Password is required."),
+});
+
+export type ProfileFormSchemaType = yup.InferType<typeof ProfileFormSchema>;
