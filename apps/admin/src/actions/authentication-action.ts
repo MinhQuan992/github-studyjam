@@ -17,10 +17,13 @@ import type { ServerActionResponse } from "./base-action";
 export const authenticate = async (
   data: CredentialSchemaType
 ): Promise<ServerActionResponse> => {
+  console.log("Started connecting to DB...");
   await connectDB();
+  console.log(`Authenticating for user ${data.username}`);
   const user = await User.findOne<UserInterface>({
     username: data.username,
   }).exec();
+  console.log("After querying database...");
   if (!user) {
     return {
       success: false,
@@ -28,6 +31,7 @@ export const authenticate = async (
     };
   }
 
+  console.log("Comparing passwords...");
   if (!bcrypt.compareSync(data.password, user.password)) {
     return {
       success: false,
@@ -38,6 +42,7 @@ export const authenticate = async (
   const secret = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
   const alg = "HS256";
 
+  console.log("Generating token...");
   const token = await new jose.SignJWT({ role: user.role })
     .setProtectedHeader({ alg })
     .setSubject(user.username)
@@ -45,6 +50,7 @@ export const authenticate = async (
     .setExpirationTime("2h")
     .sign(secret);
 
+  console.log("Setting cookies...");
   cookies().set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
