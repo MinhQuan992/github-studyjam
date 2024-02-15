@@ -5,6 +5,7 @@
     "dev": "turbo dev",
     "dev:admin": "turbo dev --filter admin",
     "dev:participant": "turbo dev --filter participant",
+    "dev:node-server": "turbo dev --filter ggsheets-server",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
