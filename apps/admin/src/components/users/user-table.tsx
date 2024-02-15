@@ -1,22 +1,23 @@
 "use client";
 
-import { IUser } from "@models/user";
 import { BorderColor, DeleteOutline } from "@mui/icons-material";
 import { Checkbox, IconButton } from "@mui/material";
 import CustomButton from "@repo/ui/custom-button";
-import { ChangeEvent, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useState } from "react";
 import CustomModal from "@repo/ui/custom-modal";
-import UserForm from "./user-form";
-import { actionWithRole } from "@actions/base-action";
-import { USER_ROLES } from "@lib/constants";
-import { deleteUsers } from "@actions/user-action";
 import CustomSnackbar from "@repo/ui/custom-snackbar";
+import { actionWithRole } from "@actions/base-action";
+import { UserRoles } from "@lib/constants";
+import { deleteUsers } from "@actions/user-action";
+import type { UserInterface } from "@models/user";
+import UserForm from "./user-form";
 
 export interface UserTableProps {
-  users: IUser[];
+  users: UserInterface[];
 }
 
-const UserTable = ({ users }: UserTableProps) => {
+function UserTable({ users }: UserTableProps) {
   const [selectAllChecked, setSelectAllChecked] = useState(false);
   const [rowCheckboxes, setRowCheckboxes] = useState(
     new Array(users.length).fill(false)
@@ -36,11 +37,18 @@ const UserTable = ({ users }: UserTableProps) => {
   const [selectedUsername, setSelectedUsername] = useState("");
   const [selectedUsernames, setSelectedUsernames] = useState([""]);
 
-  const handleCloseAddUserModal = () => setOpenAddUserModal(false);
-  const handleCloseDeleteManyUsersModal = () =>
+  const handleCloseAddUserModal = () => {
+    setOpenAddUserModal(false);
+  };
+  const handleCloseDeleteManyUsersModal = () => {
     setOpenDeleteManyUsersModal(false);
-  const handleCloseEditUserModal = () => setOpenEditUserModal(false);
-  const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
+  };
+  const handleCloseEditUserModal = () => {
+    setOpenEditUserModal(false);
+  };
+  const handleCloseDeleteUserModal = () => {
+    setOpenDeleteUserModal(false);
+  };
 
   const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
@@ -54,9 +62,9 @@ const UserTable = ({ users }: UserTableProps) => {
     }
   };
 
-  const handleRowCheckboxChange = (index: number) => {
+  const handleRowCheckboxChange = (selectedIndex: number) => {
     const updatedRowCheckboxes = [...rowCheckboxes];
-    updatedRowCheckboxes[index] = !updatedRowCheckboxes[index];
+    updatedRowCheckboxes[selectedIndex] = !updatedRowCheckboxes[selectedIndex];
     setRowCheckboxes(updatedRowCheckboxes);
     setSelectAllChecked(updatedRowCheckboxes.every((checkbox) => checkbox));
     setEnableDeleteButton(updatedRowCheckboxes.some((checkbox) => checkbox));
@@ -80,15 +88,19 @@ const UserTable = ({ users }: UserTableProps) => {
     <div>
       <div className="flex justify-end gap-4 pb-4">
         <CustomButton
-          label="Delete"
           buttonType="danger"
           disabled={!enableDeleteButton}
-          onClick={() => setOpenDeleteManyUsersModal(true)}
+          label="Delete"
+          onClick={() => {
+            setOpenDeleteManyUsersModal(true);
+          }}
         />
         <CustomButton
-          label="Add User"
           buttonType="primary"
-          onClick={() => setOpenAddUserModal(true)}
+          label="Add User"
+          onClick={() => {
+            setOpenAddUserModal(true);
+          }}
         />
       </div>
       <table className="border-collapse w-full" id="user-table">
@@ -96,8 +108,8 @@ const UserTable = ({ users }: UserTableProps) => {
           <tr>
             <th>
               <Checkbox
-                disabled={users.length === 0}
                 checked={selectAllChecked}
+                disabled={users.length === 0}
                 onChange={handleSelectAllChange}
               />
             </th>
@@ -110,11 +122,13 @@ const UserTable = ({ users }: UserTableProps) => {
         </thead>
         <tbody>
           {rowCheckboxes.map((isChecked, index) => (
-            <tr key={index}>
+            <tr key={users[index]._id}>
               <td className="text-center">
                 <Checkbox
                   checked={isChecked}
-                  onChange={() => handleRowCheckboxChange(index)}
+                  onChange={() => {
+                    handleRowCheckboxChange(index);
+                  }}
                 />
               </td>
               <td>{users[index]._id}</td>
@@ -146,29 +160,31 @@ const UserTable = ({ users }: UserTableProps) => {
         </tbody>
       </table>
       <CustomModal
-        title="Add user"
-        open={openAddUserModal}
         handleClose={handleCloseAddUserModal}
+        open={openAddUserModal}
+        title="Add user"
       >
         <UserForm
           closeModal={handleCloseAddUserModal}
-          openSnackbar={() => setOpenAddUserSnackbar(true)}
+          openSnackbar={() => {
+            setOpenAddUserSnackbar(true);
+          }}
         />
       </CustomModal>
       <CustomModal
-        title="Delete user(s)"
-        open={openDeleteManyUsersModal}
         handleClose={handleCloseDeleteManyUsersModal}
+        open={openDeleteManyUsersModal}
+        title="Delete user(s)"
       >
         <div className="flex flex-col gap-4">
           <p>{`Are you sure to delete (these) user(s): ${selectedUsernames.join(", ")}?`}</p>
           <div className="flex justify-center">
             <CustomButton
-              label="Delete"
               buttonType="danger"
+              label="Delete"
               onClick={async () => {
                 await actionWithRole(
-                  USER_ROLES.SUPER_ADMIN,
+                  UserRoles.SuperAdmin,
                   deleteUsers,
                   selectedUsernames
                 );
@@ -180,18 +196,18 @@ const UserTable = ({ users }: UserTableProps) => {
         </div>
       </CustomModal>
       <CustomModal
-        title="Delete user"
-        open={openDeleteUserModal}
         handleClose={handleCloseDeleteUserModal}
+        open={openDeleteUserModal}
+        title="Delete user"
       >
         <div className="flex flex-col gap-4">
           <p>Are you sure to delete user {selectedUsername}?</p>
           <div className="flex justify-center">
             <CustomButton
-              label="Delete"
               buttonType="danger"
+              label="Delete"
               onClick={async () => {
-                await actionWithRole(USER_ROLES.SUPER_ADMIN, deleteUsers, [
+                await actionWithRole(UserRoles.SuperAdmin, deleteUsers, [
                   selectedUsername,
                 ]);
                 handleCloseDeleteUserModal();
@@ -202,35 +218,37 @@ const UserTable = ({ users }: UserTableProps) => {
         </div>
       </CustomModal>
       <CustomModal
-        title="Edit user"
-        open={openEditUserModal}
         handleClose={handleCloseEditUserModal}
+        open={openEditUserModal}
+        title="Edit user"
       >
         <UserForm
-          user={users.find((user) => user.username === selectedUsername)}
-          hasPasswordCheckbox={true}
-          passwordCheckboxText="Set a new password"
           closeModal={handleCloseEditUserModal}
-          openSnackbar={() => setOpenEditUserSnackbar(true)}
+          hasPasswordCheckbox
+          openSnackbar={() => {
+            setOpenEditUserSnackbar(true);
+          }}
+          passwordCheckboxText="Set a new password"
+          user={users.find((user) => user.username === selectedUsername)}
         />
       </CustomModal>
       <CustomSnackbar
+        message="Added user successfully!"
         openState={openAddUserSnackbar}
         setOpenState={setOpenAddUserSnackbar}
-        message="Added user successfully!"
       />
       <CustomSnackbar
+        message="Deleted user(s) successfully!"
         openState={openDeleteUserSnackbar}
         setOpenState={setOpenDeleteUserSnackbar}
-        message="Deleted user(s) successfully!"
       />
       <CustomSnackbar
+        message="Edited user successfully!"
         openState={openEditUserSnackbar}
         setOpenState={setOpenEditUserSnackbar}
-        message="Edited user successfully!"
       />
     </div>
   );
-};
+}
 
 export default UserTable;

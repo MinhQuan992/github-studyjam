@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyJwt } from "@lib/utils";
-import { SESSION_COOKIE_NAME, USER_ROLES } from "@lib/constants";
+import { SESSION_COOKIE_NAME, UserRoles } from "@lib/constants";
 
 export const middleware = async (request: NextRequest) => {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
@@ -14,14 +14,13 @@ export const middleware = async (request: NextRequest) => {
       if (
         pathname === "/" ||
         (pathname.startsWith("/dashboard/users") &&
-          decodedToken.role === USER_ROLES.ADMIN) ||
+          decodedToken.role === UserRoles.Admin) ||
         (pathname.startsWith("/dashboard/marking") &&
-          decodedToken.role === USER_ROLES.SUPER_ADMIN)
+          decodedToken.role === UserRoles.SuperAdmin)
       ) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
-      } else {
-        return NextResponse.next();
       }
+      return NextResponse.next();
     }
 
     return forceLogin(request);

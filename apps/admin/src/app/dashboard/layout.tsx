@@ -1,5 +1,3 @@
-import { SESSION_COOKIE_NAME, USER_ROLES } from "@lib/constants";
-import { isRole } from "@lib/utils";
 import {
   Home,
   People,
@@ -7,8 +5,11 @@ import {
   AccountCircle,
   Checklist,
 } from "@mui/icons-material";
-import SideNav, { TabProps } from "@repo/ui/sidenav";
+import type { TabProps } from "@repo/ui/sidenav";
+import SideNav from "@repo/ui/sidenav";
 import { cookies } from "next/headers";
+import { isRole } from "@lib/utils";
+import { SESSION_COOKIE_NAME, UserRoles } from "@lib/constants";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   const tabs: TabProps[] = [
@@ -30,7 +31,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
   ];
 
   const token = cookies().get(SESSION_COOKIE_NAME)?.value;
-  const isSuperAdmin = await isRole(USER_ROLES.SUPER_ADMIN, token);
+  const isSuperAdmin = await isRole(UserRoles.SuperAdmin, token);
 
   if (isSuperAdmin) {
     tabs.splice(1, 0, {

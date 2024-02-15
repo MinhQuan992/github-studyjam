@@ -1,23 +1,26 @@
 "use server";
 
-import {
-  SESSION_COOKIE_NAME,
-  WRONG_USERNAME_OR_PASSWORD_MESSAGE,
-} from "@lib/constants";
-import { CredentialSchemaType } from "@lib/definitions";
-import connectDB from "@lib/mongodb";
-import { User } from "@models/user";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as jose from "jose";
 import * as bcrypt from "bcryptjs";
-import { ServerActionResponse } from "./base-action";
+import {
+  SESSION_COOKIE_NAME,
+  WRONG_USERNAME_OR_PASSWORD_MESSAGE,
+} from "@lib/constants";
+import type { CredentialSchemaType } from "@lib/definitions";
+import connectDB from "@lib/mongodb";
+import { User } from "@models/user";
+import type { UserInterface } from "@models/user";
+import type { ServerActionResponse } from "./base-action";
 
 export const authenticate = async (
   data: CredentialSchemaType
 ): Promise<ServerActionResponse> => {
   await connectDB();
-  const user = await User.findOne({ username: data.username }).exec();
+  const user = await User.findOne<UserInterface>({
+    username: data.username,
+  }).exec();
   if (!user) {
     return {
       success: false,

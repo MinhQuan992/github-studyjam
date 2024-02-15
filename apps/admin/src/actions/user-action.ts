@@ -1,14 +1,15 @@
 "use server";
 
+import * as bcrypt from "bcryptjs";
 import {
   MUST_PROVIDE_PASSWORD_MESSAGE,
   USERNAME_ALREADY_EXISTS_MESSAGE,
 } from "@lib/constants";
-import { UserFormSchema, UserFormSchemaType } from "@lib/definitions";
+import type { UserFormSchemaType } from "@lib/definitions";
+import { UserFormSchema } from "@lib/definitions";
 import connectDB from "@lib/mongodb";
 import { User } from "@models/user";
-import * as bcrypt from "bcryptjs";
-import { ServerActionResponse } from "./base-action";
+import type { ServerActionResponse } from "./base-action";
 
 export const getAllUsers = async (): Promise<ServerActionResponse> => {
   await connectDB();
@@ -72,7 +73,7 @@ export const deleteUsers = async (
   usernames: string[]
 ): Promise<ServerActionResponse> => {
   await connectDB();
-  User.deleteMany({
+  await User.deleteMany({
     username: {
       $in: usernames,
     },
@@ -97,7 +98,7 @@ export const editUser = async (
         username: data.username,
       }).exec();
       if (
-        userWithNewUserName.length == 1 &&
+        userWithNewUserName.length === 1 &&
         userWithNewUserName[0]._id !== user._id
       ) {
         return {

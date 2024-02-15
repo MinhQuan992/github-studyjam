@@ -1,14 +1,16 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { ServerActionResponse } from "./base-action";
+import * as bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 import { SESSION_COOKIE_NAME } from "@lib/constants";
 import { verifyJwt } from "@lib/utils";
 import connectDB from "@lib/mongodb";
 import { User } from "@models/user";
-import { ProfileFormSchema, ProfileFormSchemaType } from "@lib/definitions";
-import * as bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
+import type { UserInterface } from "@models/user";
+import type { ProfileFormSchemaType } from "@lib/definitions";
+import { ProfileFormSchema } from "@lib/definitions";
+import type { ServerActionResponse } from "./base-action";
 
 export const getProfileInfo = async (): Promise<ServerActionResponse> => {
   const token = cookies().get(SESSION_COOKIE_NAME)?.value;
@@ -22,7 +24,9 @@ export const getProfileInfo = async (): Promise<ServerActionResponse> => {
   }
 
   await connectDB();
-  const currentUser = await User.findOne({ username: decodedToken.sub }).exec();
+  const currentUser = await User.findOne<UserInterface>({
+    username: decodedToken.sub,
+  }).exec();
   return {
     success: true,
     data: currentUser,
