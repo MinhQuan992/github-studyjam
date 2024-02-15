@@ -5,7 +5,7 @@ export const MUST_PROVIDE_PASSWORD_MESSAGE =
   "Password must be provided when adding a new user.";
 export const FORBIDDEN_MESSAGE = "You are not allowed to do this action.";
 
-export enum USER_ROLES {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
+export enum UserRoles {
+  SuperAdmin = "SUPER_ADMIN",
+  Admin = "ADMIN",
 }

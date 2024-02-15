@@ -1,11 +1,11 @@
+import PageHeader from "@repo/ui/page-header";
 import { actionWithRole } from "@actions/base-action";
 import { getAllUsers } from "@actions/user-action";
 import UserTable from "@components/users/user-table";
-import { USER_ROLES } from "@lib/constants";
-import PageHeader from "@repo/ui/page-header";
+import { UserRoles } from "@lib/constants";
 
 const Page = async () => {
-  const response = await actionWithRole(USER_ROLES.SUPER_ADMIN, getAllUsers);
+  const response = await actionWithRole(UserRoles.SuperAdmin, getAllUsers);
 
   return (
     <div>

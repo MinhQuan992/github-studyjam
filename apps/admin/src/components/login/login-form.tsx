@@ -3,10 +3,11 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
 import { useFormik } from "formik";
 import React from "react";
-import { CredentialSchemaType, CredentialSchema } from "@lib/definitions";
+import type { CredentialSchemaType } from "@lib/definitions";
+import { CredentialSchema } from "@lib/definitions";
 import { authenticate } from "@actions/authentication-action";
 
-const LoginForm = () => {
+function LoginForm() {
   const {
     values,
     touched,
@@ -23,9 +24,9 @@ const LoginForm = () => {
       password: "",
     },
     validationSchema: CredentialSchema,
-    onSubmit: async (values) => {
-      const response = await authenticate(values);
-      if (response?.success === false) {
+    onSubmit: async (formValues) => {
+      const response = await authenticate(formValues);
+      if (!response.success) {
         setStatus(response.message);
       }
     },
@@ -43,41 +44,41 @@ const LoginForm = () => {
       >
         <TextField
           className="pb-4 w-1/3"
-          id="username"
-          name="username"
-          label="Username"
-          value={values.username}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={resetStatus}
           error={touched.username && Boolean(errors.username)}
-          helperText={touched.username && errors.username}
+          helperText={touched.username ? errors.username : null}
+          id="username"
+          label="Username"
+          name="username"
+          onBlur={handleBlur}
+          onChange={handleChange}
+          onFocus={resetStatus}
+          value={values.username}
         />
         <TextField
           className="pb-4 w-1/3"
+          error={touched.password && Boolean(errors.password)}
+          helperText={touched.password ? errors.password : null}
           id="password"
-          name="password"
           label="Password"
+          name="password"
+          onBlur={handleBlur}
+          onChange={handleChange}
+          onFocus={resetStatus}
           type="password"
           value={values.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={resetStatus}
-          error={touched.password && Boolean(errors.password)}
-          helperText={touched.password && errors.password}
         />
         <Button
-          type="submit"
           className="w-1/3 border-solid border"
-          endIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
           disabled={isSubmitting}
+          endIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
+          type="submit"
         >
           Log in
         </Button>
-        {status && <p className="w-1/3 text-red-600 pt-4">{status}</p>}
+        {status ? <p className="w-1/3 text-red-600 pt-4">{status}</p> : null}
       </form>
     </div>
   );
-};
+}
 
 export default LoginForm;

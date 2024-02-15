@@ -1,6 +1,6 @@
+import PageHeader from "@repo/ui/page-header";
 import { getProfileInfo } from "@actions/profile-action";
 import ProfileForm from "@components/profile/profile-form";
-import PageHeader from "@repo/ui/page-header";
 
 const Page = async () => {
   const response = await getProfileInfo();

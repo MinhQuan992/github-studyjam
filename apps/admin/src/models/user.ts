@@ -1,7 +1,7 @@
-import { USER_ROLES } from "@lib/constants";
 import mongoose from "mongoose";
+import { UserRoles } from "@lib/constants";
 
-export interface IUser extends mongoose.Document {
+export interface UserInterface extends mongoose.Document {
   fullName: string;
   username: string;
   password: string;
@@ -15,8 +15,8 @@ const UserModel = new mongoose.Schema(
     password: String,
     role: {
       type: String,
-      enum: Object.values(USER_ROLES),
-      default: USER_ROLES.ADMIN,
+      enum: Object.values(UserRoles),
+      default: UserRoles.Admin,
     },
   },
   {
@@ -26,4 +26,4 @@ const UserModel = new mongoose.Schema(
 );
 
 export const User =
-  mongoose.models.User || mongoose.model<IUser>("User", UserModel);
+  mongoose.models.User || mongoose.model<UserInterface>("User", UserModel);

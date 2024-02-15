@@ -9,7 +9,8 @@ if (!DATABASE_URL) {
 let cached = global.mongoose;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  global.mongoose = { conn: null, promise: null };
+  cached = global.mongoose;
 }
 
 async function connectDB() {
@@ -22,8 +23,8 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(DATABASE_URL, opts).then((mongoose) => {
-      return mongoose;
+    cached.promise = mongoose.connect(DATABASE_URL, opts).then((mg) => {
+      return mg;
     });
   }
   cached.conn = await cached.promise;

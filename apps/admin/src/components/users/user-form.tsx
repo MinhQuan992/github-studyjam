@@ -1,39 +1,35 @@
 "use client";
 
-import { actionWithRole } from "@actions/base-action";
-import { addUser, editUser } from "@actions/user-action";
-import { USER_ROLES } from "@lib/constants";
-import { UserFormSchema, UserFormSchemaType } from "@lib/definitions";
-import { IUser } from "@models/user";
 import { Checkbox, FormControlLabel, TextField } from "@mui/material";
 import CustomButton from "@repo/ui/custom-button";
 import { useFormik } from "formik";
 import { useState } from "react";
+import { actionWithRole } from "@actions/base-action";
+import { addUser, editUser } from "@actions/user-action";
+import { UserRoles } from "@lib/constants";
+import type { UserFormSchemaType } from "@lib/definitions";
+import { UserFormSchema } from "@lib/definitions";
+import type { UserInterface } from "@models/user";
 
 interface UserFormProps {
-  user?: IUser;
+  user?: UserInterface;
   hasPasswordCheckbox?: boolean;
   passwordCheckboxText?: string;
   closeModal: () => void;
   openSnackbar: () => void;
 }
 
-const UserForm = ({
+function UserForm({
   user,
   hasPasswordCheckbox = false,
   passwordCheckboxText = "",
   closeModal,
   openSnackbar,
-}: UserFormProps) => {
+}: UserFormProps) {
   const onSubmitHandler = async (values: UserFormSchemaType) => {
     const result = !user
-      ? await actionWithRole(USER_ROLES.SUPER_ADMIN, addUser, values)
-      : await actionWithRole(
-          USER_ROLES.SUPER_ADMIN,
-          editUser,
-          values,
-          user._id
-        );
+      ? await actionWithRole(UserRoles.SuperAdmin, addUser, values)
+      : await actionWithRole(UserRoles.SuperAdmin, editUser, values, user._id);
     if (!result.success) {
       if (result.fieldError === "username") {
         setErrors({
@@ -77,67 +73,67 @@ const UserForm = ({
     <div>
       <form className="flex flex-col gap-5 py-5" onSubmit={handleSubmit}>
         <TextField
-          id="fullName"
-          name="fullName"
-          label="Full Name"
-          value={values.fullName}
-          onChange={handleChange}
-          onBlur={handleBlur}
           error={touched.fullName && Boolean(errors.fullName)}
-          helperText={touched.fullName && errors.fullName}
+          helperText={touched.fullName ? errors.fullName : null}
+          id="fullName"
+          label="Full Name"
+          name="fullName"
+          onBlur={handleBlur}
+          onChange={handleChange}
+          value={values.fullName}
         />
         <TextField
-          id="username"
-          name="username"
-          label="Username"
-          value={values.username}
-          onChange={handleChange}
-          onBlur={handleBlur}
           error={touched.username && Boolean(errors.username)}
-          helperText={touched.username && errors.username}
+          helperText={touched.username ? errors.username : null}
+          id="username"
+          label="Username"
+          name="username"
+          onBlur={handleBlur}
+          onChange={handleChange}
+          value={values.username}
         />
-        {hasPasswordCheckbox && (
+        {hasPasswordCheckbox ? (
           <FormControlLabel
-            label={passwordCheckboxText}
             control={
               <Checkbox
-                onChange={(event) => {
+                onChange={async (event) => {
                   setEnablePassword(event.target.checked);
-                  setFieldValue("newPassword", event.target.checked);
+                  await setFieldValue("newPassword", event.target.checked);
                 }}
               />
             }
+            label={passwordCheckboxText}
           />
-        )}
+        ) : null}
         <TextField
-          id="password"
-          name="password"
-          label="Password"
-          type="password"
-          value={values.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
           disabled={!enablePassword}
           error={touched.password && Boolean(errors.password)}
-          helperText={touched.password && errors.password}
+          helperText={touched.password ? errors.password : null}
+          id="password"
+          label="Password"
+          name="password"
+          onBlur={handleBlur}
+          onChange={handleChange}
+          type="password"
+          value={values.password}
         />
         <div className="flex justify-center gap-4">
           <CustomButton
-            label="Cancel"
             buttonType="secondary"
+            label="Cancel"
             onClick={closeModal}
           />
           <CustomButton
-            disabled={!dirty}
-            label="Save"
             buttonType="primary"
-            type="submit"
+            disabled={!dirty}
             isLoading={isSubmitting}
+            label="Save"
+            type="submit"
           />
         </div>
       </form>
     </div>
   );
-};
+}
 
 export default UserForm;

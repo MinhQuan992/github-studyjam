@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import { USER_ROLES } from "./constants";
+import type { UserRoles } from "./constants";
 
 export const verifyJwt = async (token?: string) => {
   if (!token) {
@@ -16,7 +16,7 @@ export const verifyJwt = async (token?: string) => {
   }
 };
 
-export const isRole = async (role: USER_ROLES, token?: string) => {
+export const isRole = async (role: UserRoles, token?: string) => {
   const decodedToken = await verifyJwt(token);
 
   if (!decodedToken) {

@@ -1,22 +1,19 @@
 "use server";
 
-import {
-  FORBIDDEN_MESSAGE,
-  SESSION_COOKIE_NAME,
-  USER_ROLES,
-} from "@lib/constants";
-import { isRole } from "@lib/utils";
 import { cookies } from "next/headers";
+import type { UserRoles } from "@lib/constants";
+import { FORBIDDEN_MESSAGE, SESSION_COOKIE_NAME } from "@lib/constants";
+import { isRole } from "@lib/utils";
 
-export type ServerActionResponse = {
+export interface ServerActionResponse {
   success: boolean;
   data?: any;
   fieldError?: string;
   message?: string;
-};
+}
 
 export const actionWithRole = async (
-  role: USER_ROLES,
+  role: UserRoles,
   action: (...args: any[]) => Promise<ServerActionResponse>,
   ...args: any[]
 ): Promise<ServerActionResponse> => {
