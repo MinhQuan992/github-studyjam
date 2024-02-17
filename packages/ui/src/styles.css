@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-.css-1t4lqmc-MuiButtonBase-root-MuiTab-root {
+a.MuiTab-root {
   min-width: fit-content;
 }
 
-.css-1t4lqmc-MuiButtonBase-root-MuiTab-root.Mui-selected {
-  color: white;
+a.Mui-selected {
+  color: white !important;
 }
