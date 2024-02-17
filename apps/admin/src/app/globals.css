@@ -25,6 +25,6 @@
   color: white;
 }
 
-.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-checked {
-  color: black;
+.Mui-checked {
+  color: black !important;
 }

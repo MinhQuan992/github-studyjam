@@ -37,13 +37,9 @@ function LoginForm() {
   };
 
   return (
-    <div>
-      <form
-        className="flex flex-col items-center w-screen"
-        onSubmit={handleSubmit}
-      >
+    <div className="flex justify-center w-screen">
+      <form className="flex flex-col gap-4 w-1/3" onSubmit={handleSubmit}>
         <TextField
-          className="pb-4 w-1/3"
           error={touched.username && Boolean(errors.username)}
           helperText={touched.username ? errors.username : null}
           id="username"
@@ -55,7 +51,6 @@ function LoginForm() {
           value={values.username}
         />
         <TextField
-          className="pb-4 w-1/3"
           error={touched.password && Boolean(errors.password)}
           helperText={touched.password ? errors.password : null}
           id="password"
@@ -68,14 +63,14 @@ function LoginForm() {
           value={values.password}
         />
         <Button
-          className="w-1/3 border-solid border"
+          className="!border-solid !border"
           disabled={isSubmitting}
           endIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
           type="submit"
         >
           Log in
         </Button>
-        {status ? <p className="w-1/3 text-red-600 pt-4">{status}</p> : null}
+        {status ? <p className="text-red-600 pt-4">{status}</p> : null}
       </form>
     </div>
   );
