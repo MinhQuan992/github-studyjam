@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import { fetcher } from "./fetcher";
+import { fetcher } from "./fetcher.js";
 import dotenv from "dotenv";
 
 const app = express();
@@ -18,9 +18,9 @@ app.get("/sheet", async (req, res) => {
   }
 
   try {
-    const data = await fetcher(sheetId as string, range as string);
+    const data = await fetcher(sheetId, range);
     return res.json({ data: data });
-  } catch (err: any) {
+  } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 });

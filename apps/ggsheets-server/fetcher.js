@@ -2,14 +2,14 @@ import { JWT } from "google-auth-library";
 import dotenv from "dotenv";
 import { google } from "googleapis";
 
-export const fetcher = async (sheetId: string, range: string) => {
+export const fetcher = async (sheetId, range) => {
   dotenv.config();
   const scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
 
   const jwt = new JWT(
     process.env.GOOGLE_SHEETS_API_CLIENT_EMAIL,
     undefined,
-    process.env.GOOGLE_SHEETS_API_PRIVATE_KEY!.split(String.raw`\n`).join("\n"),
+    process.env.GOOGLE_SHEETS_API_PRIVATE_KEY.split(String.raw`\n`).join("\n"),
     scopes
   );
 
