@@ -10,6 +10,7 @@ import type { TaskInterface } from "@models/task";
 import { UserRoles } from "@lib/constants";
 import { openNextTask } from "@actions/task-action";
 import { actionWithRole } from "@actions/base-action";
+import { finalizeWeeklyMarking } from "@actions/marking-action";
 
 interface ActiveTaskProps {
   task?: TaskInterface;
@@ -32,7 +33,7 @@ function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
         />
       ) : (
         <>
-          <ListAlt className="text-[256px]" />
+          <ListAlt className="!text-[256px]" />
           <h1>
             There is no active task.{isSuperAdmin ? " Open the first one!" : ""}
           </h1>
@@ -48,7 +49,9 @@ function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
             }}
           />
           <CustomModal
-            handleClose={() => { setOpenModal(false); }}
+            handleClose={() => {
+              setOpenModal(false);
+            }}
             open={openModal}
             title="Open new task"
           >
@@ -68,6 +71,13 @@ function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
                       openNextTask,
                       activeWeek
                     );
+                    if (activeWeek > 0) {
+                      await actionWithRole(
+                        UserRoles.SuperAdmin,
+                        finalizeWeeklyMarking,
+                        activeWeek
+                      );
+                    }
                     setOpenModal(false);
                     router.refresh();
                   }}

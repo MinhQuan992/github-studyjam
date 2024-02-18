@@ -22,7 +22,12 @@ const Page = async () => {
             : activeTask.data
         }
       />
-      {activeTask.data && isSuperAdmin ? <FetchSubmissionsForm /> : null}
+      {activeTask.data && isSuperAdmin ? (
+        <FetchSubmissionsForm
+          activeWeek={activeTask.data.week}
+          numberOfACs={activeTask.data.numberOfACs}
+        />
+      ) : null}
     </div>
   );
 };

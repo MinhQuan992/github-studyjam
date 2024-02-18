@@ -6,15 +6,20 @@ import CustomSnackbar from "@repo/ui/custom-snackbar";
 import { useFormik } from "formik";
 import { useState } from "react";
 import { FetchSubmissionsFormSchema } from "@lib/definitions";
-import type {
-  FetchSubmissionsFormSchemaType,
-  GoogleSheetsApiResponseError,
-} from "@lib/definitions";
+import type { FetchSubmissionsFormSchemaType } from "@lib/definitions";
 import { fetchFormSubmissions } from "@actions/marking-action";
 import { actionWithRole } from "@actions/base-action";
 import { UserRoles } from "@lib/constants";
 
-function FetchSubmissionsForm() {
+interface FetchSubmissionsFormProps {
+  activeWeek: number;
+  numberOfACs: number;
+}
+
+function FetchSubmissionsForm({
+  activeWeek,
+  numberOfACs,
+}: FetchSubmissionsFormProps) {
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const {
@@ -40,13 +45,15 @@ function FetchSubmissionsForm() {
         UserRoles.SuperAdmin,
         fetchFormSubmissions,
         formValues.sheetId,
-        formValues.range
+        formValues.range,
+        activeWeek,
+        numberOfACs
       );
       if (result.success) {
         resetForm();
         setOpenSuccessSnackbar(true);
       } else {
-        setStatus((result.data as GoogleSheetsApiResponseError).error);
+        setStatus(result.message);
         setOpenErrorSnackbar(true);
       }
     },
