@@ -39,3 +39,24 @@ export const ProfileFormSchema = yup.object({
 });
 
 export type ProfileFormSchemaType = yup.InferType<typeof ProfileFormSchema>;
+
+export interface GoogleSheetsApiResponseSuccess {
+  data: {
+    range: string;
+    majorDimension: string;
+    values: string[][];
+  };
+}
+
+export interface GoogleSheetsApiResponseError {
+  error: string;
+}
+
+export const FetchSubmissionsFormSchema = yup.object({
+  sheetId: yup.string().required("Sheet ID is required."),
+  range: yup.string().required("Range is required."),
+});
+
+export type FetchSubmissionsFormSchemaType = yup.InferType<
+  typeof FetchSubmissionsFormSchema
+>;

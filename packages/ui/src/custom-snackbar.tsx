@@ -5,12 +5,14 @@ interface CustomSnackbarProps {
   openState: boolean;
   setOpenState: Dispatch<SetStateAction<boolean>>;
   message: string;
+  type?: "success" | "error";
 }
 
 const CustomSnackbar = ({
   openState,
   setOpenState,
   message,
+  type = "success",
 }: CustomSnackbarProps) => {
   const handleClose = (
     _event?: React.SyntheticEvent | Event,
@@ -32,7 +34,7 @@ const CustomSnackbar = ({
     >
       <Alert
         onClose={handleClose}
-        severity="success"
+        severity={type}
         variant="filled"
         sx={{ width: "100%" }}
       >
