@@ -4,9 +4,10 @@ import type {
   GoogleSheetsApiResponseError,
   GoogleSheetsApiResponseSuccess,
 } from "@lib/definitions";
-import type { ServerActionResponse } from "./base-action";
+import type { WeeklyScoreInterface } from "@models/weekly-score";
 import { WeeklyScore } from "@models/weekly-score";
 import connectDB from "@lib/mongodb";
+import type { ServerActionResponse } from "./base-action";
 
 export const fetchFormSubmissions = async (
   sheetId: string,
@@ -58,7 +59,7 @@ const generateNewWeeklyScoreDoc = async (
     },
     {
       week: activeWeek,
-      numberOfACs: numberOfACs,
+      numberOfACs,
       groups: scoreArray,
     },
     {
@@ -70,9 +71,27 @@ const generateNewWeeklyScoreDoc = async (
 export const finalizeWeeklyMarking = async (
   activeWeek: number
 ): Promise<ServerActionResponse> => {
+  // TODO: implement this function
   await connectDB();
   return {
     success: true,
     data: activeWeek,
   };
+};
+
+export const getScoresOfWeek = async (
+  week: number
+): Promise<ServerActionResponse<WeeklyScoreInterface>> => {
+  await connectDB();
+  const result = await WeeklyScore.findOne<WeeklyScoreInterface>({
+    week,
+  }).exec();
+  return result !== null
+    ? {
+        success: true,
+        data: result,
+      }
+    : {
+        success: false,
+      };
 };
