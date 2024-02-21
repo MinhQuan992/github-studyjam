@@ -5,9 +5,9 @@ import type { UserRoles } from "@lib/constants";
 import { FORBIDDEN_MESSAGE, SESSION_COOKIE_NAME } from "@lib/constants";
 import { isRole } from "@lib/utils";
 
-export interface ServerActionResponse {
+export interface ServerActionResponse<T = any> {
   success: boolean;
-  data?: any;
+  data?: T;
   fieldError?: string;
   message?: string;
 }
