@@ -7,6 +7,8 @@ import type {
 import type { WeeklyScoreInterface } from "@models/weekly-score";
 import { WeeklyScore } from "@models/weekly-score";
 import connectDB from "@lib/mongodb";
+import type { GroupScoreInterface } from "@models/group-score";
+import { GroupScore } from "@models/group-score";
 import type { ServerActionResponse } from "./base-action";
 
 export const fetchFormSubmissions = async (
@@ -71,12 +73,67 @@ const generateNewWeeklyScoreDoc = async (
 export const finalizeWeeklyMarking = async (
   activeWeek: number
 ): Promise<ServerActionResponse> => {
-  // TODO: implement this function
   await connectDB();
+  const weekScores = await WeeklyScore.findOne<WeeklyScoreInterface>({
+    week: activeWeek,
+  }).exec();
+
+  if (!weekScores) {
+    return {
+      success: false,
+    };
+  }
+
+  const groupsHaveBonus = weekScores.groups
+    .filter(
+      (group) =>
+        group.accept &&
+        isEligibleForRankingBonus(group.acs, weekScores.numberOfACs)
+    )
+    .slice(0, 3);
+  let bonusPoint = 3;
+  groupsHaveBonus.forEach((group) => {
+    group.rankingBonus = bonusPoint;
+    bonusPoint--;
+  });
+
+  weekScores.groups = weekScores.groups.map((group) => {
+    const updatedGroup = groupsHaveBonus.find(
+      (bonusGroup) => bonusGroup.groupName === group.groupName
+    );
+
+    if (updatedGroup) {
+      return { ...group, rankingBonus: updatedGroup.rankingBonus };
+    }
+
+    return group;
+  });
+
+  await weekScores.save();
+
+  weekScores.groups.forEach(async (group) => {
+    const increasedScore = group.accept
+      ? group.acs.filter((ac) => ac).length + group.rankingBonus
+      : 0;
+
+    const groupScore = await GroupScore.findOne<GroupScoreInterface>({
+      groupName: group.groupName,
+    });
+
+    if (groupScore) {
+      groupScore.score += increasedScore;
+      groupScore.achieveGifts = groupScore.achieveGifts && increasedScore > 0;
+      await groupScore.save();
+    }
+  });
+
   return {
     success: true,
-    data: activeWeek,
   };
+};
+
+const isEligibleForRankingBonus = (acs: boolean[], numberOfACs: number) => {
+  return acs.filter((ac) => ac).length / numberOfACs > 0.5;
 };
 
 export const getScoresOfWeek = async (
@@ -94,4 +151,38 @@ export const getScoresOfWeek = async (
     : {
         success: false,
       };
+};
+
+export const updateResults = async (
+  week: number,
+  groupIndex: number,
+  isGivingMark: boolean,
+  acs?: boolean[]
+): Promise<ServerActionResponse> => {
+  await connectDB();
+  const weekScores = await WeeklyScore.findOne<WeeklyScoreInterface>({
+    week,
+  }).exec();
+
+  if (!weekScores || groupIndex < 0 || groupIndex >= weekScores.groups.length) {
+    return {
+      success: false,
+    };
+  }
+
+  const updatedGroup = weekScores.groups[groupIndex];
+
+  if (isGivingMark) {
+    updatedGroup.acs = acs ?? updatedGroup.acs;
+  } else {
+    updatedGroup.accept = !updatedGroup.accept;
+  }
+
+  weekScores.groups[groupIndex] = updatedGroup;
+
+  await weekScores.save();
+
+  return {
+    success: true,
+  };
 };

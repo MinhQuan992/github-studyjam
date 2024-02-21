@@ -11,6 +11,7 @@ import { UserRoles } from "@lib/constants";
 import { openNextTask } from "@actions/task-action";
 import { actionWithRole } from "@actions/base-action";
 import { finalizeWeeklyMarking } from "@actions/marking-action";
+import CustomSnackbar from "@repo/ui/custom-snackbar";
 
 interface ActiveTaskProps {
   task?: TaskInterface;
@@ -20,7 +21,34 @@ interface ActiveTaskProps {
 function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
+  const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
+  const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
   const activeWeek = task ? task.week : 0;
+
+  const handleOpenNextTask = async () => {
+    if (activeWeek > 0) {
+      const finalizeRes = await actionWithRole(
+        UserRoles.SuperAdmin,
+        finalizeWeeklyMarking,
+        activeWeek
+      );
+
+      if (finalizeRes.success) {
+        await actionWithRole(UserRoles.SuperAdmin, openNextTask, activeWeek);
+        setOpenModal(false);
+        setOpenSuccessSnackbar(true);
+        router.refresh();
+      } else {
+        setOpenModal(false);
+        setOpenErrorSnackbar(true);
+      }
+    } else {
+      await actionWithRole(UserRoles.SuperAdmin, openNextTask, activeWeek);
+      setOpenModal(false);
+      setOpenSuccessSnackbar(true);
+      router.refresh();
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -65,28 +93,24 @@ function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
                 <CustomButton
                   buttonType="primary"
                   label="Open"
-                  onClick={async () => {
-                    await actionWithRole(
-                      UserRoles.SuperAdmin,
-                      openNextTask,
-                      activeWeek
-                    );
-                    if (activeWeek > 0) {
-                      await actionWithRole(
-                        UserRoles.SuperAdmin,
-                        finalizeWeeklyMarking,
-                        activeWeek
-                      );
-                    }
-                    setOpenModal(false);
-                    router.refresh();
-                  }}
+                  onClick={handleOpenNextTask}
                 />
               </div>
             </div>
           </CustomModal>
         </>
       ) : null}
+      <CustomSnackbar
+        message="An error occurred. Ensure that the submissions of this week have been fetched first!"
+        openState={openErrorSnackbar}
+        setOpenState={setOpenErrorSnackbar}
+        type="error"
+      />
+      <CustomSnackbar
+        message="Open the next task successfully!"
+        openState={openSuccessSnackbar}
+        setOpenState={setOpenSuccessSnackbar}
+      />
     </div>
   );
 }

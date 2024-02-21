@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 
 export interface GroupScoreInterface extends mongoose.Document {
   groupName: string;
-  scores: number[];
-  achieveGift: boolean;
+  score: number;
+  achieveGifts: boolean;
 }
 
 const GroupScoreModel = new mongoose.Schema(
   {
     groupName: String,
-    scores: [Number],
-    achieveGift: Boolean,
+    score: Number,
+    achieveGifts: Boolean,
   },
   {
     timestamps: true,
