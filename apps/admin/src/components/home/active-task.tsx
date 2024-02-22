@@ -6,12 +6,13 @@ import CustomModal from "@repo/ui/custom-modal";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import CustomSnackbar from "@repo/ui/custom-snackbar";
+import Link from "next/link";
 import type { TaskInterface } from "@models/task";
 import { UserRoles } from "@lib/constants";
 import { openNextTask } from "@actions/task-action";
 import { actionWithRole } from "@actions/base-action";
 import { finalizeWeeklyMarking } from "@actions/marking-action";
-import CustomSnackbar from "@repo/ui/custom-snackbar";
 
 interface ActiveTaskProps {
   task?: TaskInterface;
@@ -53,12 +54,21 @@ function ActiveTask({ task, isSuperAdmin }: ActiveTaskProps) {
   return (
     <div className="flex flex-col items-center gap-4">
       {task ? (
-        <Image
-          alt="Task description"
-          height={856}
-          src={`/images/${task.image}`}
-          width={1024}
-        />
+        <>
+          <Image
+            alt="Task description"
+            height={856}
+            src="/images/poster.jpeg"
+            width={1024}
+          />
+          <Link
+            className="text-blue-500 hover:text-blue-700 hover:underline pb-4"
+            href={task.url}
+            target="_blank"
+          >
+            TASK #{task.week}
+          </Link>
+        </>
       ) : (
         <>
           <ListAlt className="!text-[256px]" />

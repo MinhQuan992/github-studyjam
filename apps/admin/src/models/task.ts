@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface TaskInterface extends mongoose.Document {
-  image: string;
+  url: string;
   active: boolean;
   week: number;
   numberOfACs: number;
@@ -9,7 +9,7 @@ export interface TaskInterface extends mongoose.Document {
 
 const TaskModel = new mongoose.Schema(
   {
-    image: String,
+    url: String,
     active: Boolean,
     week: Number,
     numberOfACs: Number,
