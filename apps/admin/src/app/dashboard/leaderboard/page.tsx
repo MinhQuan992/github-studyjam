@@ -11,7 +11,7 @@ const Page = async () => {
   return (
     <div>
       <PageHeader title="Leaderboard" />
-      {groups ? (
+      {groups && groups.some((group) => group.score > 0) ? (
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-end">
             <Podium

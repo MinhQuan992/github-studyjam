@@ -111,20 +111,24 @@ export const finalizeWeeklyMarking = async (
 
   await weekScores.save();
 
-  weekScores.groups.forEach(async (group) => {
-    const increasedScore = group.accept
-      ? group.acs.filter((ac) => ac).length + group.rankingBonus
-      : 0;
+  const weekScoresMap = new Map<string, number>();
 
-    const groupScore = await GroupScore.findOne<GroupScoreInterface>({
-      groupName: group.groupName,
-    });
+  weekScores.groups.forEach((group) => {
+    weekScoresMap.set(
+      group.groupName,
+      group.accept
+        ? group.acs.filter((ac) => ac).length + group.rankingBonus
+        : 0
+    );
+  });
 
-    if (groupScore) {
-      groupScore.score += increasedScore;
-      groupScore.achieveGifts = groupScore.achieveGifts && increasedScore > 0;
-      await groupScore.save();
-    }
+  const groupScores = await GroupScore.find<GroupScoreInterface>().exec();
+
+  groupScores.forEach(async (groupScore) => {
+    const increasedScore = weekScoresMap.get(groupScore.groupName) ?? 0;
+    groupScore.score += increasedScore;
+    groupScore.achieveGifts = groupScore.achieveGifts && increasedScore > 0;
+    await groupScore.save();
   });
 
   return {
