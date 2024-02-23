@@ -2,12 +2,14 @@
 
 import { Button, CircularProgress, TextField } from "@mui/material";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import type { CredentialSchemaType } from "@lib/definitions";
 import { CredentialSchema } from "@lib/definitions";
 import { authenticate } from "@actions/authentication-action";
+import CustomSnackbar from "@repo/ui/custom-snackbar";
 
 function LoginForm() {
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const {
     values,
     touched,
@@ -28,13 +30,10 @@ function LoginForm() {
       const response = await authenticate(formValues);
       if (!response.success) {
         setStatus(response.message);
+        setOpenSnackbar(true);
       }
     },
   });
-
-  const resetStatus = () => {
-    setStatus("");
-  };
 
   return (
     <div className="flex justify-center w-screen">
@@ -47,7 +46,6 @@ function LoginForm() {
           name="username"
           onBlur={handleBlur}
           onChange={handleChange}
-          onFocus={resetStatus}
           value={values.username}
         />
         <TextField
@@ -58,7 +56,6 @@ function LoginForm() {
           name="password"
           onBlur={handleBlur}
           onChange={handleChange}
-          onFocus={resetStatus}
           type="password"
           value={values.password}
         />
@@ -70,7 +67,12 @@ function LoginForm() {
         >
           Log in
         </Button>
-        {status ? <p className="text-red-600 pt-4">{status}</p> : null}
+        <CustomSnackbar
+          message={status}
+          openState={openSnackbar}
+          setOpenState={setOpenSnackbar}
+          type="error"
+        />
       </form>
     </div>
   );
