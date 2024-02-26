@@ -4,6 +4,8 @@ import { getActiveTask } from "@actions/server-actions";
 import Link from "next/link";
 import Image from "next/image";
 
+export const revalidate = 60;
+
 const Page = async () => {
   const activeTaskRes = await getActiveTask();
   const task = activeTaskRes.data;
