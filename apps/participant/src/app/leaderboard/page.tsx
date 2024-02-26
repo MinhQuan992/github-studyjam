@@ -4,6 +4,8 @@ import { getLeaderboard } from "@actions/server-actions";
 import NormalBoard from "@components/leaderboard/normal-board";
 import Podium from "@components/leaderboard/podium";
 
+export const revalidate = 60;
+
 const Page = async () => {
   const getLeaderboardRes = await getLeaderboard();
   const groups = getLeaderboardRes.data;
